@@ -1,4 +1,4 @@
-transformers
+transformers==4.53.3
 accelerate
 huggingface_hub
 safetensors
@@ -6,4 +6,4 @@ sentencepiece
 protobuf
 pandas
 tqdm
-
+pillow
