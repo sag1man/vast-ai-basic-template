@@ -6,8 +6,12 @@ RUN apt-get update && apt-get install -y \
     git \
     curl \
     wget \
+    build-essential \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
+
+ENV CC=gcc
+ENV CXX=g++
 
 COPY requirements.txt /app/requirements.txt
 
