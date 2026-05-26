@@ -4,6 +4,7 @@ WORKDIR /app
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
+    PIP_BREAK_SYSTEM_PACKAGES=1 \
     TOKENIZERS_PARALLELISM=false \
     HF_HUB_ENABLE_HF_TRANSFER=1 \
     HF_HOME=/workspace/hf-cache \
@@ -45,14 +46,14 @@ ENV CXX=g++
 
 COPY requirements.txt /app/requirements.txt
 
-RUN pip install -U pip setuptools wheel packaging ninja cmake && \
-    pip install -r /app/requirements.txt \
+RUN python -m pip install -U pip setuptools wheel packaging ninja cmake && \
+    python -m pip install -r /app/requirements.txt \
       --extra-index-url https://download.pytorch.org/whl/cu128
 
 RUN git clone https://github.com/ModelTC/lightllm.git ${LIGHTLLM_DIR} && \
     cd ${LIGHTLLM_DIR} && \
     git submodule update --init --recursive || true && \
-    pip install -e . --no-build-isolation
+    python -m pip install -e . --no-build-isolation
 
 COPY scripts/bootstrap.sh /app/scripts/bootstrap.sh
 RUN chmod +x /app/scripts/bootstrap.sh
