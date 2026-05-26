@@ -1,9 +1,10 @@
-transformers==4.53.3
-accelerate
 huggingface_hub
+hf_transfer
+hf_xet
+transformers
+accelerate
 safetensors
 sentencepiece
 protobuf
-pandas
-tqdm
-pillow
+requests
+vllm
