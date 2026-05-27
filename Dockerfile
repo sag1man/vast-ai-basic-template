@@ -50,7 +50,7 @@ ENV CXX=g++
 
 COPY requirements.txt /app/requirements.txt
 
-RUN python -m pip install -r /app/requirements.txt
+RUN python3 -m pip install -r /app/requirements.txt
 
 COPY scripts/bootstrap.sh /app/scripts/bootstrap.sh
 RUN chmod +x /app/scripts/bootstrap.sh

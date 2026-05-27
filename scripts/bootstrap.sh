@@ -24,7 +24,7 @@ nvidia-smi || true
 
 echo
 echo "== Python / Torch / CUDA =="
-python - <<'PY'
+python3 - <<'PY'
 import sys
 import torch
 
@@ -40,7 +40,7 @@ PY
 
 echo
 echo "== vLLM =="
-python - <<'PY'
+python3 - <<'PY'
 try:
     import vllm
     print("vllm:", vllm.__version__)
