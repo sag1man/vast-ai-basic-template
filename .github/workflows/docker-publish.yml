@@ -23,6 +23,18 @@
         - name: Checkout
           uses: actions/checkout@v6
 
+        - name: Free runner disk space
+          run: |
+            df -h
+            sudo rm -rf /usr/local/lib/android
+            sudo rm -rf /usr/share/dotnet
+            sudo rm -rf /opt/ghc
+            sudo rm -rf /opt/hostedtoolcache/CodeQL
+            sudo rm -rf /opt/hostedtoolcache/go
+            sudo rm -rf /opt/hostedtoolcache/node
+            sudo docker system prune -af --volumes
+            df -h
+
         - name: Log in to GHCR
           uses: docker/login-action@v4
           with:
@@ -41,5 +53,4 @@
             tags: |
               ghcr.io/${{ github.repository }}:latest
               ghcr.io/${{ github.repository }}:${{ github.sha }}
-            cache-from: type=gha
-            cache-to: type=gha,mode=max
+            provenance: false
