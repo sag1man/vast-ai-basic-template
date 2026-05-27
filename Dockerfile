@@ -1,7 +1,4 @@
-FROM pytorch/pytorch:2.12.0-cuda13.0-cudnn9-devel
-
-ARG VLLM_VERSION=0.21.0
-ARG CUDA_VERSION=130
+FROM vllm/vllm-openai:v0.21.0
 
 WORKDIR /app
 
@@ -53,14 +50,10 @@ ENV CXX=g++
 
 COPY requirements.txt /app/requirements.txt
 
-RUN python -m pip install -U pip setuptools wheel packaging ninja cmake && \
-    python -m pip install -r /app/requirements.txt \
-      --extra-index-url https://download.pytorch.org/whl/cu${CUDA_VERSION} && \
-    python -m pip install \
-      https://github.com/vllm-project/vllm/releases/download/v${VLLM_VERSION}/vllm-${VLLM_VERSION}+cu${CUDA_VERSION}-cp38-abi3-manylinux_2_35_x86_64.whl \
-      --extra-index-url https://download.pytorch.org/whl/cu${CUDA_VERSION}
+RUN python -m pip install -r /app/requirements.txt
 
 COPY scripts/bootstrap.sh /app/scripts/bootstrap.sh
 RUN chmod +x /app/scripts/bootstrap.sh
 
+ENTRYPOINT []
 CMD ["/app/scripts/bootstrap.sh"]
