@@ -13,12 +13,15 @@ ENV DEBIAN_FRONTEND=noninteractive \
     XDG_CACHE_HOME=/workspace/.cache \
     PYTORCH_ALLOC_CONF=expandable_segments:True \
     PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
-    LIGHTLLM_DIR=/opt/lightllm \
     HOST=0.0.0.0 \
     PORT=8000 \
     API_PORT=8000 \
     LOG_DIR=/workspace/logs \
     HF_MODEL="" \
+    VLLM_AUTO_START=0 \
+    VLLM_MODEL="" \
+    VLLM_SERVED_MODEL_NAME="" \
+    VLLM_EXTRA_ARGS="" \
     GH_REPO="" \
     GH_REF=main \
     GH_DIR=/workspace/github-repo \
@@ -49,11 +52,6 @@ COPY requirements.txt /app/requirements.txt
 RUN python -m pip install -U pip setuptools wheel packaging ninja cmake && \
     python -m pip install -r /app/requirements.txt \
       --extra-index-url https://download.pytorch.org/whl/cu128
-
-RUN git clone https://github.com/ModelTC/lightllm.git ${LIGHTLLM_DIR} && \
-    cd ${LIGHTLLM_DIR} && \
-    git submodule update --init --recursive || true && \
-    python -m pip install -e . --no-build-isolation
 
 COPY scripts/bootstrap.sh /app/scripts/bootstrap.sh
 RUN chmod +x /app/scripts/bootstrap.sh

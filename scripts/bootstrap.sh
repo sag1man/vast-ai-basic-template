@@ -7,7 +7,7 @@ mkdir -p "${LOG_DIR}"
 BOOT_LOG="${LOG_DIR}/bootstrap-$(date -u +%Y%m%dT%H%M%SZ).log"
 exec > >(tee -a "${BOOT_LOG}") 2>&1
 
-echo "== Vast AI basic template =="
+echo "== Vast AI vLLM template =="
 date
 echo "LOG_DIR=${LOG_DIR}"
 echo "BOOT_LOG=${BOOT_LOG}"
@@ -49,13 +49,6 @@ except Exception as e:
 PY
 
 echo
-echo "== LightLLM =="
-PYTHONPATH="${LIGHTLLM_DIR}:${PYTHONPATH:-}" python - <<'PY'
-import lightllm
-print("lightllm:", lightllm.__file__)
-PY
-
-echo
 echo "== Ports =="
 ss -lntp || true
 
@@ -65,6 +58,7 @@ echo "== Optional Hugging Face model =="
 if [ -n "${HF_MODEL:-}" ]; then
     HF_MODEL_NAME="${HF_MODEL##*/}"
     HF_MODEL_DIR="${HF_MODEL_DIR:-/workspace/models/${HF_MODEL_NAME}}"
+    export HF_MODEL_DIR
 
     echo "HF_MODEL=${HF_MODEL}"
     echo "HF_MODEL_DIR=${HF_MODEL_DIR}"
@@ -145,6 +139,47 @@ if [ -n "${GH_REPO:-}" ]; then
     fi
 else
     echo "No GH_REPO provided."
+fi
+
+echo
+echo "== Optional vLLM server =="
+
+if [ "${VLLM_AUTO_START:-0}" = "1" ] || [ "${VLLM_AUTO_START:-0}" = "true" ]; then
+    VLLM_MODEL_PATH="${VLLM_MODEL:-${HF_MODEL_DIR:-${HF_MODEL:-}}}"
+
+    if [ -z "${VLLM_MODEL_PATH}" ]; then
+        echo "ERROR: VLLM_AUTO_START is enabled, but VLLM_MODEL or HF_MODEL is not set."
+        exit 1
+    fi
+
+    VLLM_LOG="${LOG_DIR}/vllm-$(date -u +%Y%m%dT%H%M%SZ).log"
+
+    VLLM_ARGS=(
+        serve "${VLLM_MODEL_PATH}"
+        --host "${HOST:-0.0.0.0}"
+        --port "${PORT:-8000}"
+    )
+
+    if [ -n "${VLLM_SERVED_MODEL_NAME:-}" ]; then
+        VLLM_ARGS+=(--served-model-name "${VLLM_SERVED_MODEL_NAME}")
+    fi
+
+    if [ -n "${VLLM_EXTRA_ARGS:-}" ]; then
+        read -r -a VLLM_EXTRA_ARGS_ARRAY <<< "${VLLM_EXTRA_ARGS}"
+        VLLM_ARGS+=("${VLLM_EXTRA_ARGS_ARRAY[@]}")
+    fi
+
+    echo "VLLM_MODEL_PATH=${VLLM_MODEL_PATH}"
+    echo "VLLM_LOG=${VLLM_LOG}"
+    echo "VLLM_ARGS=${VLLM_ARGS[*]}"
+
+    vllm "${VLLM_ARGS[@]}" \
+        > >(tee -a "${VLLM_LOG}") \
+        2> >(tee -a "${VLLM_LOG}" >&2)
+
+    exit $?
+else
+    echo "VLLM_AUTO_START is disabled."
 fi
 
 echo
