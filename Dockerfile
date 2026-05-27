@@ -1,4 +1,7 @@
-FROM pytorch/pytorch:2.11.0-cuda12.8-cudnn9-devel
+FROM pytorch/pytorch:2.12.0-cuda13.0-cudnn9-devel
+
+ARG VLLM_VERSION=0.21.0
+ARG CUDA_VERSION=130
 
 WORKDIR /app
 
@@ -7,6 +10,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PIP_BREAK_SYSTEM_PACKAGES=1 \
     TOKENIZERS_PARALLELISM=false \
     HF_HUB_ENABLE_HF_TRANSFER=1 \
+    HF_XET_HIGH_PERFORMANCE=1 \
     HF_HOME=/workspace/hf-cache \
     HF_HUB_CACHE=/workspace/hf-cache/hub \
     TRANSFORMERS_CACHE=/workspace/hf-cache \
@@ -51,7 +55,10 @@ COPY requirements.txt /app/requirements.txt
 
 RUN python -m pip install -U pip setuptools wheel packaging ninja cmake && \
     python -m pip install -r /app/requirements.txt \
-      --extra-index-url https://download.pytorch.org/whl/cu128
+      --extra-index-url https://download.pytorch.org/whl/cu${CUDA_VERSION} && \
+    python -m pip install \
+      https://github.com/vllm-project/vllm/releases/download/v${VLLM_VERSION}/vllm-${VLLM_VERSION}+cu${CUDA_VERSION}-cp38-abi3-manylinux_2_35_x86_64.whl \
+      --extra-index-url https://download.pytorch.org/whl/cu${CUDA_VERSION}
 
 COPY scripts/bootstrap.sh /app/scripts/bootstrap.sh
 RUN chmod +x /app/scripts/bootstrap.sh

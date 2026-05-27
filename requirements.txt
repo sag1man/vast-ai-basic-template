@@ -7,4 +7,3 @@ safetensors
 sentencepiece
 protobuf
 requests
-vllm
