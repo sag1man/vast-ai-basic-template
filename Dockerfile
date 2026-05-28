@@ -14,19 +14,14 @@ ENV DEBIAN_FRONTEND=noninteractive \
     XDG_CACHE_HOME=/workspace/.cache \
     PYTORCH_ALLOC_CONF=expandable_segments:True \
     PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
-    HOST=0.0.0.0 \
-    PORT=8000 \
-    API_PORT=8000 \
     LOG_DIR=/workspace/logs \
     HF_MODEL="" \
-    VLLM_AUTO_START=0 \
-    VLLM_MODEL="" \
-    VLLM_SERVED_MODEL_NAME="" \
-    VLLM_EXTRA_ARGS="" \
+    HF_MODEL_DIR="" \
     GH_REPO="" \
     GH_REF=main \
     GH_DIR=/workspace/github-repo \
-    GH_EXEC=""
+    GH_EXEC="" \
+    GH_EXEC_ARGS=""
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
@@ -56,4 +51,4 @@ COPY scripts/bootstrap.sh /app/scripts/bootstrap.sh
 RUN chmod +x /app/scripts/bootstrap.sh
 
 ENTRYPOINT []
-CMD ["/app/scripts/bootstrap.sh"]
+CMD ["bash"]
